@@ -1,0 +1,4 @@
+# JitPack runs "./gradlew build publishToMavenLocal" on each tag.
+# Gradle runs on JDK 21 here; the foojay resolver in settings.gradle.kts downloads the JDK 25 toolchain.
+jdk:
+  - openjdk21
