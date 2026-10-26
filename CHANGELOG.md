@@ -3,6 +3,15 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## Unreleased
+
+### Added
+- `Scheduler`: one API for running tasks on every platform.
+  - Folia: global region, region, entity and async schedulers.
+  - Spigot and Paper: the Bukkit scheduler.
+  - Entity tasks stop once the entity is removed or the player logs out, matching Folia on every platform.
+- `Task`: a handle to cancel a scheduled task or check whether it is cancelled.
+
 ## 1.0.0
 
 First release: platform detection and the command layer.

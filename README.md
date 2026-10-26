@@ -7,6 +7,10 @@ Version 1.0.0 covers:
 - **Platform detection:** `Platform.current().core()` returns `SPIGOT`, `PAPER`, `PURPUR` or `FOLIA`, detected once at startup.
 - **Commands:** `CommandService.create(this)` sets up Incendo Cloud v2 for the server. Paper, Purpur and Folia get native Brigadier. Spigot gets standard Bukkit registration.
 
+Unreleased:
+
+- **Scheduler:** `Scheduler.create(this)` runs tasks on Folia's global, region, entity and async schedulers, and on the Bukkit scheduler everywhere else. Plugins never call `Bukkit.getScheduler()` themselves.
+
 ## How to use it
 
 **1. Add it** in `build.gradle.kts`:
@@ -56,12 +60,32 @@ public final class MExamplePlugin extends JavaPlugin {
 public final class ExampleCommands {
 
     @Command("mexample|mex ping")
-    @Permission("mseries.mexample.ping")
+    @Permission("mexample.ping")
     public void ping(CommandActor actor) {
         actor.reply("pong");
     }
 }
 ```
+
+**4. Schedule tasks** through core instead of `Bukkit.getScheduler()`:
+
+```java
+Scheduler scheduler = Scheduler.create(this);
+
+scheduler.runAt(block.getLocation(), () -> block.setType(Material.AIR));
+scheduler.runFor(player, () -> player.sendMessage("Welcome back"));
+scheduler.runAsync(() -> loadFromDatabase());
+Task countdown = scheduler.runForTimer(player, this::tick, 20L, 20L);
+```
+
+| Method | Folia | Spigot and Paper |
+| --- | --- | --- |
+| `run`, `runLater`, `runTimer` | Global region | Main thread |
+| `runAt...` (a location) | That location's region | Main thread |
+| `runFor...` (an entity) | That entity's scheduler; skipped once it is removed | Main thread; skipped once it is removed or the player logs out |
+| `runAsync...` | Async scheduler | Bukkit async |
+
+Delays and periods are in ticks. Call `scheduler.cancelAll()` in `onDisable`.
 
 Ship both `plugin.yml` and `paper-plugin.yml` with `folia-supported: true`, and don't list commands in either file.
 
