@@ -5,6 +5,8 @@ paper = "26.3.build.223-stable"
 cloud = "2.1.0"
 cloud-minecraft = "2.0.1"
 brigadier = "1.3.10"
+adventure = "4.21.0"
+adventure-platform = "4.4.1"
 
 [libraries]
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
@@ -14,3 +16,9 @@ brigadier = { module = "com.mojang:brigadier", version.ref = "brigadier" }
 cloud-core = { module = "org.incendo:cloud-core", version.ref = "cloud" }
 cloud-annotations = { module = "org.incendo:cloud-annotations", version.ref = "cloud" }
 cloud-paper = { module = "org.incendo:cloud-paper", version.ref = "cloud-minecraft" }
+# Bundled for MiniMessage text on every platform; plugins relocate net.kyori with core.
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
+adventure-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure" }
+adventure-plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }

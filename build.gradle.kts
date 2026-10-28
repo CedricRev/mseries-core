@@ -47,6 +47,11 @@ dependencies {
     api(libs.cloud.core)
     api(libs.cloud.annotations)
     api(libs.cloud.paper)
+    api(libs.adventure.api)
+    api(libs.adventure.minimessage)
+    api(libs.adventure.legacy)
+    api(libs.adventure.plain)
+    api(libs.adventure.platform.bukkit)
 
     "paperCompileOnly"(libs.paper.api)
 }
