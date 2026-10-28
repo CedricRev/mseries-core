@@ -5,7 +5,7 @@ plugins {
 
 group = "me.cedricrev.mseries"
 // Manual CI runs pass -PdevBuild=<short-sha> to get a <version>-dev+<sha> test build.
-version = "1.0.0" + (findProperty("devBuild")?.let { "-dev+$it" } ?: "")
+version = "1.1.0" + (findProperty("devBuild")?.let { "-dev+$it" } ?: "")
 
 repositories {
     mavenCentral()

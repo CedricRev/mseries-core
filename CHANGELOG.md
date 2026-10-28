@@ -3,7 +3,7 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
-## Unreleased
+## 1.1.0
 
 ### Added
 - `ConfigFile`: loads a YAML file from the plugin folder, saving the default from the jar on first start.
