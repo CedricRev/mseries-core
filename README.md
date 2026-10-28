@@ -9,6 +9,8 @@ Version 1.0.0 covers:
 
 Unreleased:
 
+- **Config files:** `ConfigFile.load(this, "config.yml")` saves the default, adds new settings from the jar to the owner's file and bumps `config-version`.
+- **Messages:** `Messages.load(this)` reads `messages.yml` and sends MiniMessage text with the plugin's `prefix` on Spigot, Paper and Folia.
 - **Scheduler:** `Scheduler.create(this)` runs tasks on Folia's global, region, entity and async schedulers, and on the Bukkit scheduler everywhere else. Plugins never call `Bukkit.getScheduler()` themselves.
 
 ## How to use it
@@ -37,10 +39,11 @@ tasks.withType<JavaCompile>().configureEach {
 
 ```kotlin
 tasks.shadowJar {
-    val lib = "me.cedricrev.mseries.<plugin>.lib"
+    val lib = "me.cedricrev.<plugin>.lib"
     relocate("me.cedricrev.mseries.core", "$lib.core")
     relocate("org.incendo.cloud", "$lib.cloud")
     relocate("io.leangen.geantyref", "$lib.geantyref")
+    relocate("net.kyori", "$lib.kyori")
     exclude("META-INF/services/javax.annotation.processing.Processor")
 }
 ```
@@ -88,6 +91,31 @@ Task countdown = scheduler.runForTimer(player, this::tick, 20L, 20L);
 Delays and periods are in ticks. Call `scheduler.cancelAll()` in `onDisable`.
 
 Ship both `plugin.yml` and `paper-plugin.yml` with `folia-supported: true`, and don't list commands in either file.
+
+**5. Load config and messages** in `onEnable`, and reload both from the `reload` command:
+
+```java
+ConfigFile config = ConfigFile.load(this, "config.yml");
+Messages messages = Messages.load(this);
+
+int goal = config.yaml().getInt("vote-party.goal");
+messages.send(player, "vote.received", Arg.of("site", siteName));
+```
+
+`messages.yml` holds every player-facing line and one `prefix`:
+
+```yaml
+config-version: 1
+prefix: "<gray>[<gold>MExample</gold>]</gray> "
+vote:
+  received: "<green>Thanks for voting on <site>!"
+```
+
+- `send` adds the prefix; `sendRaw`, `sendActionBar` and `sendTitle` don't.
+- An empty message (`""`) is not sent, so owners can turn a line off.
+- `Arg.of` escapes its value, so player names can't add colors or click events. Use `Arg.formatted` only for text the owner wrote.
+- `legacy` and `plain` return strings for item names and inventory titles.
+- Call `messages.close()` in `onDisable`.
 
 ## License
 
