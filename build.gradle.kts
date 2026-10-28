@@ -13,6 +13,7 @@ repositories {
     maven("https://hub.spigotmc.org/nexus/content/repositories/public/")
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://libraries.minecraft.net/")
+    maven("https://repo.opencollab.dev/main/")
 }
 
 java {
@@ -42,6 +43,8 @@ configurations.named(paper.compileClasspathConfigurationName) {
 dependencies {
     compileOnly(libs.spigot.api)
     compileOnly(libs.brigadier)
+    compileOnly(libs.floodgate.api)
+    compileOnly(libs.cumulus)
 
     // Exposed to plugins, which shade and relocate them together with core.
     api(libs.cloud.core)
@@ -51,6 +54,7 @@ dependencies {
     api(libs.adventure.minimessage)
     api(libs.adventure.legacy)
     api(libs.adventure.plain)
+    api(libs.adventure.gson)
     api(libs.adventure.platform.bukkit)
     api(libs.hikari)
 

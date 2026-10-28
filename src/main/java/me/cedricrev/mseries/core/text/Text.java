@@ -57,6 +57,10 @@ public final class Text {
         return LEGACY.serialize(component);
     }
 
+    public static String bedrock(Component component) {
+        return LegacyComponentSerializer.legacySection().serialize(component);
+    }
+
     public static String plain(Component component) {
         return PlainTextComponentSerializer.plainText().serialize(component);
     }

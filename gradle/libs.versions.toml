@@ -10,6 +10,8 @@ adventure-platform = "4.4.1"
 hikari = "7.1.0"
 sqlite = "3.53.4.0"
 junit = "5.14.4"
+floodgate = "2.2.3-SNAPSHOT"
+cumulus = "1.1.2"
 
 [libraries]
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
@@ -24,6 +26,7 @@ adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" 
 adventure-minimessage = { module = "net.kyori:adventure-text-minimessage", version.ref = "adventure" }
 adventure-legacy = { module = "net.kyori:adventure-text-serializer-legacy", version.ref = "adventure" }
 adventure-plain = { module = "net.kyori:adventure-text-serializer-plain", version.ref = "adventure" }
+adventure-gson = { module = "net.kyori:adventure-text-serializer-gson", version.ref = "adventure" }
 adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform" }
 # Connection pool for SQLite and MySQL/MariaDB; the JDBC drivers come with the server.
 hikari = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
@@ -31,3 +34,6 @@ sqlite-jdbc = { module = "org.xerial:sqlite-jdbc", version.ref = "sqlite" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
 junit-launcher = { module = "org.junit.platform:junit-platform-launcher" }
+# Provided by the Floodgate plugin at runtime; only loaded when Floodgate is enabled.
+floodgate-api = { module = "org.geysermc.floodgate:api", version.ref = "floodgate" }
+cumulus = { module = "org.geysermc.cumulus:cumulus", version.ref = "cumulus" }
