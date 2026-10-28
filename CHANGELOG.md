@@ -20,6 +20,7 @@ This project follows [Semantic Versioning](https://semver.org/).
   - `migrate(from, to)` copies every table between SQLite and MySQL into an empty database and never deletes the source.
   - `warnIfSwitched` logs a warning when the database in use is empty but the other one still has data.
   - Uses the SQLite and MySQL drivers that ship with the server; only HikariCP is bundled.
+- `Hooks`: loads soft-dependency hooks only when the other plugin is enabled, and turns the feature off with one warning if the hook fails.
 - `Text`: MiniMessage parsing and legacy or plain output for item names and inventory titles.
 - `Scheduler`: one API for running tasks on every platform.
   - Folia: global region, region, entity and async schedulers.
