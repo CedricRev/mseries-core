@@ -2,13 +2,10 @@
 
 Shared library for MSeries plugins. Every MSeries plugin shades it in; it is never installed on a server by itself.
 
-Version 1.0.0 covers:
+What it gives a plugin:
 
 - **Platform detection:** `Platform.current().core()` returns `SPIGOT`, `PAPER`, `PURPUR` or `FOLIA`, detected once at startup.
 - **Commands:** `CommandService.create(this)` sets up Incendo Cloud v2 for the server. Paper, Purpur and Folia get native Brigadier. Spigot gets standard Bukkit registration.
-
-Unreleased:
-
 - **Config files:** `ConfigFile.load(this, "config.yml")` saves the default, adds new settings from the jar to the owner's file and bumps `config-version`.
 - **Messages:** `Messages.load(this)` reads `messages.yml` and sends MiniMessage text with the plugin's `prefix` on Spigot, Paper and Folia.
 - **Storage:** `Storage.open(this, settings, tables...)` connects to SQLite or MySQL/MariaDB, runs numbered migrations and gives async queries.
