@@ -22,6 +22,15 @@ This project follows [Semantic Versioning](https://semver.org/).
   - Uses the SQLite and MySQL drivers that ship with the server; only HikariCP is bundled.
 - `Hooks`: loads soft-dependency hooks only when the other plugin is enabled, and turns the feature off with one warning if the hook fails.
 - `Text`: MiniMessage parsing and legacy or plain output for item names and inventory titles.
+- Menus: one `Menu` description, shown by `Menus` in the best style for each player.
+  - Bedrock players get a Cumulus form through Floodgate, Java players on 1.21.6 or newer get a dialog, and everyone else gets a chest menu.
+  - Button menus and yes/no confirm menus. Chest menus support fixed slots, chest-only buttons, pages and refreshing.
+  - Floodgate is optional; without it Bedrock players see the Java menu.
+- `NameResolver`: finds a player from a typed name, for example a vote.
+  - Remembers every player who joins in a `known_players` table in the plugin's database.
+  - On servers with an empty Floodgate `username-prefix`, also accepts the Bedrock gamertag, with or without spaces, and a loose match that counts only when one player fits.
+  - With a prefix set, only the exact in-game name matches.
+- `Text.bedrock` turns text into the section-sign format that Bedrock forms show.
 - `Scheduler`: one API for running tasks on every platform.
   - Folia: global region, region, entity and async schedulers.
   - Spigot and Paper: the Bukkit scheduler.

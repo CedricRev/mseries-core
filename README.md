@@ -13,6 +13,8 @@ Unreleased:
 - **Messages:** `Messages.load(this)` reads `messages.yml` and sends MiniMessage text with the plugin's `prefix` on Spigot, Paper and Folia.
 - **Storage:** `Storage.open(this, settings, tables...)` connects to SQLite or MySQL/MariaDB, runs numbered migrations and gives async queries.
 - **Hooks:** `Hooks.of(this).load("Vault", VaultHook::new)` loads soft-dependency hooks safely.
+- **Menus:** `Menus.create(this, scheduler, commands)` shows one menu as a Bedrock form, a Java dialog or a chest menu, picked per player.
+- **Player names:** `NameResolver.create(this, storage)` turns a typed name into a player, including Bedrock gamertags on servers without a Floodgate prefix.
 - **Scheduler:** `Scheduler.create(this)` runs tasks on Folia's global, region, entity and async schedulers, and on the Bukkit scheduler everywhere else. Plugins never call `Bukkit.getScheduler()` themselves.
 
 ## How to use it
@@ -171,6 +173,61 @@ storage.query(connection -> {
 Hooks hooks = Hooks.of(this);
 Optional<VaultHook> vault = hooks.load("Vault", VaultHook::new);
 ```
+
+**8. Show menus.** Describe a menu once; core renders it for each player:
+
+- Bedrock players (Floodgate installed) get a Cumulus form.
+- Java players on 1.21.6 or newer get a dialog.
+- Everyone else gets a chest menu.
+
+```java
+Menus menus = Menus.create(this, scheduler, commands);
+
+Menu menu = Menu.buttons(Text.parse("<gold>Vote"))
+        .body(Text.parse("Pick a site"))
+        .button(Button.of(Text.parse("Site one")).icon(Material.PAPER).action(player -> open(player, 1)).build())
+        .button(Button.of(Text.parse("Close")).slot(22).chestOnly().action(Player::closeInventory).build())
+        .build();
+menus.open(player, menu);
+
+menus.open(player, Menu.confirm(Text.parse("Reset?"), Text.parse("This cannot be undone."),
+        Button.of(Text.parse("Yes")).action(this::reset).build(),
+        Button.of(Text.parse("No")).build()));
+```
+
+- `menus.open(player, () -> buildMenu(player), 20)` rebuilds a chest menu every 20 ticks while it is open.
+- Dialog buttons run the hidden command `/<plugin>-menu <token>`, which `Menus` registers. Don't register a command with that name.
+- Floodgate and Cumulus come from the Floodgate plugin. Add `softdepend: [floodgate]` and don't shade or relocate `org.geysermc`.
+
+```kotlin
+repositories {
+    maven("https://repo.opencollab.dev/main/")
+}
+
+dependencies {
+    compileOnly("org.geysermc.floodgate:api:2.2.3-SNAPSHOT")
+}
+```
+
+**9. Find players by name** with `NameResolver`. It keeps a `known_players` table in the plugin's database and records every player on join:
+
+```java
+NameResolver names = NameResolver.create(this, storage);
+names.resolve(typedName).thenAccept(result -> {
+    switch (result.status()) {
+        case FOUND -> reward(result.uuid(), result.name());
+        case AMBIGUOUS -> getLogger().warning("Several players match " + typedName + ": " + result.candidates());
+        case NOT_FOUND, INVALID -> getLogger().info("No player called " + typedName);
+    }
+});
+```
+
+The checks run in this order:
+
+1. The exact in-game name, ignoring case. This is the only check when Floodgate is missing or has a `username-prefix`.
+2. With an empty prefix only: the name with spaces turned into `_` and cut to 16 characters, the way Floodgate names Bedrock players.
+3. With an empty prefix only: the Bedrock gamertag looked up through Floodgate, for players who have joined before.
+4. With an empty prefix only: a loose match that ignores case, spaces and `_`. It counts only when exactly one known player fits; otherwise the result is `AMBIGUOUS`.
 
 ## License
 
