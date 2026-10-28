@@ -52,6 +52,14 @@ dependencies {
     api(libs.adventure.legacy)
     api(libs.adventure.plain)
     api(libs.adventure.platform.bukkit)
+    api(libs.hikari)
+
+    // Tests run the storage layer against a real SQLite file.
+    testImplementation(libs.spigot.api)
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly(libs.junit.launcher)
+    testRuntimeOnly(libs.sqlite.jdbc)
 
     "paperCompileOnly"(libs.paper.api)
 }
@@ -60,6 +68,10 @@ tasks.withType<JavaCompile>().configureEach {
     options.release.set(21)
     options.encoding = "UTF-8"
     options.compilerArgs.add("-parameters")
+}
+
+tasks.test {
+    useJUnitPlatform()
 }
 
 tasks.jar {
