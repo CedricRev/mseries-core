@@ -14,6 +14,9 @@ repositories {
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://libraries.minecraft.net/")
     maven("https://repo.opencollab.dev/main/")
+    maven("https://repo.codemc.org/repository/maven-public/") {
+        content { includeGroup("net.milkbowl.vault") }
+    }
 }
 
 java {
@@ -45,6 +48,7 @@ dependencies {
     compileOnly(libs.brigadier)
     compileOnly(libs.floodgate.api)
     compileOnly(libs.cumulus)
+    compileOnly(libs.vault.unlocked.api) { isTransitive = false }
 
     // Exposed to plugins, which shade and relocate them together with core.
     api(libs.cloud.core)

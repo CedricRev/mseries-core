@@ -10,6 +10,7 @@ What it gives a plugin:
 - **Messages:** `Messages.load(this)` reads `messages.yml` and sends MiniMessage text with the plugin's `prefix` on Spigot, Paper and Folia.
 - **Storage:** `Storage.open(this, settings, tables...)` connects to SQLite or MySQL/MariaDB, runs numbered migrations and gives async queries.
 - **Hooks:** `Hooks.of(this).load("Vault", VaultHook::new)` loads soft-dependency hooks safely.
+- **Economy:** `Economy.vault(this)` pays and charges players through VaultUnlocked when it is installed and the legacy Vault API otherwise, and returns the economy plugin's real result.
 - **Menus:** `Menus.create(this, scheduler, commands)` shows one menu as a Bedrock form, a Java dialog or a chest menu, picked per player.
 - **Player names:** `NameResolver.create(this, storage)` turns a typed name into a player, including Bedrock gamertags on servers without a Floodgate prefix.
 - **Scheduler:** `Scheduler.create(this)` runs tasks on Folia's global, region, entity and async schedulers, and on the Bukkit scheduler everywhere else. Plugins never call `Bukkit.getScheduler()` themselves.
