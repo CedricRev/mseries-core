@@ -107,6 +107,12 @@ int goal = config.yaml().getInt("vote-party.goal");
 messages.send(player, "vote.received", Arg.of("site", siteName));
 ```
 
+Sections that owners fill with their own entries, like a list of vote sites or shop items, are passed as open sections. New settings are never added inside them, so deleted examples stay deleted. If the whole section is missing, the defaults are added:
+
+```java
+ConfigFile config = ConfigFile.load(this, "config.yml", "vote-sites", "streaks.rewards");
+```
+
 `messages.yml` holds every player-facing line and one `prefix`:
 
 ```yaml

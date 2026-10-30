@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
@@ -17,16 +18,22 @@ public final class ConfigFile {
     private final Plugin plugin;
     private final String name;
     private final File file;
+    private final List<String> openSections;
     private volatile YamlConfiguration yaml;
 
-    private ConfigFile(Plugin plugin, String name) {
+    private ConfigFile(Plugin plugin, String name, List<String> openSections) {
         this.plugin = plugin;
         this.name = name;
         this.file = new File(plugin.getDataFolder(), name);
+        this.openSections = openSections;
     }
 
     public static ConfigFile load(Plugin plugin, String name) {
-        ConfigFile config = new ConfigFile(plugin, name);
+        return load(plugin, name, new String[0]);
+    }
+
+    public static ConfigFile load(Plugin plugin, String name, String... openSections) {
+        ConfigFile config = new ConfigFile(plugin, name, List.of(openSections));
         config.reload();
         return config;
     }
@@ -82,20 +89,7 @@ public final class ConfigFile {
     }
 
     private boolean merge(YamlConfiguration target, YamlConfiguration defaults) {
-        int added = 0;
-        for (String path : defaults.getKeys(true)) {
-            if (target.contains(path, true) || !parentIsSection(target, path)) {
-                continue;
-            }
-            if (defaults.isConfigurationSection(path)) {
-                target.createSection(path);
-            } else {
-                target.set(path, defaults.get(path));
-            }
-            target.setComments(path, defaults.getComments(path));
-            target.setInlineComments(path, defaults.getInlineComments(path));
-            added++;
-        }
+        int added = addMissing(target, defaults, this.openSections);
         int current = target.getInt(VERSION_KEY, 0);
         int latest = defaults.getInt(VERSION_KEY, 0);
         boolean upgraded = current < latest;
@@ -109,6 +103,34 @@ public final class ConfigFile {
             this.plugin.getLogger().info("Updated " + this.name + " to " + VERSION_KEY + " " + Math.max(current, latest)
                     + " and added " + added + " missing setting" + (added == 1 ? "" : "s"));
             return true;
+        }
+        return false;
+    }
+
+    static int addMissing(YamlConfiguration target, YamlConfiguration defaults, List<String> openSections) {
+        List<String> userOwned = openSections.stream().filter(target::isConfigurationSection).toList();
+        int added = 0;
+        for (String path : defaults.getKeys(true)) {
+            if (target.contains(path, true) || !parentIsSection(target, path) || isInside(path, userOwned)) {
+                continue;
+            }
+            if (defaults.isConfigurationSection(path)) {
+                target.createSection(path);
+            } else {
+                target.set(path, defaults.get(path));
+            }
+            target.setComments(path, defaults.getComments(path));
+            target.setInlineComments(path, defaults.getInlineComments(path));
+            added++;
+        }
+        return added;
+    }
+
+    private static boolean isInside(String path, List<String> sections) {
+        for (String section : sections) {
+            if (path.startsWith(section + ".")) {
+                return true;
+            }
         }
         return false;
     }
