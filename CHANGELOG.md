@@ -3,6 +3,13 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 1.2.0
+
+### Added
+- `Menu.form(title)` with `Field.text`, `Field.number`, `Field.choice` and `Field.toggle`: one form description, shown as a Bedrock custom form, a Java dialog with inputs (1.21.6+) or chat questions on older Java clients.
+  - Answers are checked against each field (length, number range, known option) before the `submit` action runs, and come back typed through `FormResponse`.
+  - A wrong answer shows the form again with the owner's `invalid` message and the player's other answers kept.
+
 ## 1.1.1
 
 ### Fixed

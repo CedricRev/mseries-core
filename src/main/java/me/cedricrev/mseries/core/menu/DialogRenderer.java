@@ -4,9 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -26,13 +30,15 @@ final class DialogRenderer implements Renderer {
     private final Plugin plugin;
     private final Scheduler scheduler;
     private final String callbackCommand;
-    private final Map<UUID, Map<String, Consumer<Player>>> pending = new ConcurrentHashMap<>();
+    private final FormSubmitter submitter;
+    private final Map<UUID, Map<String, BiConsumer<Player, String>>> pending = new ConcurrentHashMap<>();
     private final CommandSender quietSender;
 
-    DialogRenderer(Plugin plugin, Scheduler scheduler, String callbackCommand) {
+    DialogRenderer(Plugin plugin, Scheduler scheduler, String callbackCommand, FormSubmitter submitter) {
         this.plugin = plugin;
         this.scheduler = scheduler;
         this.callbackCommand = callbackCommand;
+        this.submitter = submitter;
         this.quietSender = quietSender();
     }
 
@@ -52,7 +58,7 @@ final class DialogRenderer implements Renderer {
 
     @Override
     public void open(Player player, Menu menu) {
-        Map<String, Consumer<Player>> actions = new ConcurrentHashMap<>();
+        Map<String, BiConsumer<Player, String>> actions = new ConcurrentHashMap<>();
         JsonObject dialog = new JsonObject();
         dialog.add("title", json(menu.title()));
         JsonArray body = new JsonArray();
@@ -83,6 +89,80 @@ final class DialogRenderer implements Renderer {
         if (!body.isEmpty()) {
             dialog.add("body", body);
         }
+        show(player, dialog, actions);
+    }
+
+    void openForm(Player player, Menu menu, Map<String, String> values, Component error) {
+        Menu.FormParts form = menu.formParts();
+        List<Field> fields = form.fields();
+        Map<String, BiConsumer<Player, String>> actions = new ConcurrentHashMap<>();
+        JsonObject dialog = new JsonObject();
+        dialog.addProperty("type", "minecraft:confirmation");
+        dialog.add("title", json(menu.title()));
+        dialog.addProperty("can_close_with_escape", true);
+        dialog.addProperty("pause", false);
+        JsonArray body = new JsonArray();
+        if (error != null) {
+            body.add(message(error));
+        }
+        menu.body().ifPresent(text -> body.add(message(text)));
+        if (!body.isEmpty()) {
+            dialog.add("body", body);
+        }
+        JsonArray inputs = new JsonArray();
+        StringBuilder template = new StringBuilder();
+        for (int i = 0; i < fields.size(); i++) {
+            Field field = fields.get(i);
+            String key = "f" + i;
+            inputs.add(input(field, key, values.getOrDefault(field.key(), field.initial())));
+            if (i > 0) {
+                template.append(FormInput.SEPARATOR);
+            }
+            template.append("$(").append(key).append(')');
+        }
+        dialog.add("inputs", inputs);
+        String submitToken = token();
+        actions.put(submitToken, (target, joined) -> {
+            Optional<List<String>> parts = FormInput.split(joined, fields.size());
+            Map<String, String> answers = new LinkedHashMap<>();
+            if (parts.isPresent()) {
+                for (int i = 0; i < fields.size(); i++) {
+                    Field field = fields.get(i);
+                    String answer = parts.get().get(i);
+                    answers.put(field.key(), field.type() == Field.Type.CHOICE ? optionId(field, answer) : answer);
+                }
+            }
+            this.submitter.submit(target, menu, answers);
+        });
+        JsonObject yes = new JsonObject();
+        yes.add("label", json(form.submit()));
+        JsonObject submit = new JsonObject();
+        submit.addProperty("type", "minecraft:dynamic/run_command");
+        submit.addProperty("template", "/" + this.callbackCommand + " " + submitToken + " " + template);
+        yes.add("action", submit);
+        dialog.add("yes", yes);
+        Button.Builder no = Button.of(form.cancel());
+        menu.onClose().ifPresent(no::action);
+        dialog.add("no", action(player, no.build(), actions));
+        show(player, dialog, actions);
+    }
+
+    void callback(Player player, String token, String values) {
+        Map<String, BiConsumer<Player, String>> actions = this.pending.remove(player.getUniqueId());
+        if (actions == null) {
+            return;
+        }
+        BiConsumer<Player, String> action = actions.get(token);
+        if (action != null) {
+            this.scheduler.runFor(player, () -> action.accept(player, values));
+        }
+    }
+
+    void forget(UUID player) {
+        this.pending.remove(player);
+    }
+
+    private void show(Player player, JsonObject dialog, Map<String, BiConsumer<Player, String>> actions) {
         this.pending.put(player.getUniqueId(), actions);
         String command = "minecraft:dialog show " + player.getUniqueId() + " " + dialog;
         this.scheduler.run(() -> {
@@ -94,30 +174,61 @@ final class DialogRenderer implements Renderer {
         });
     }
 
-    void callback(Player player, String token) {
-        Map<String, Consumer<Player>> actions = this.pending.remove(player.getUniqueId());
-        if (actions == null) {
-            return;
+    private static JsonObject input(Field field, String key, String value) {
+        JsonObject input = new JsonObject();
+        input.addProperty("key", key);
+        input.add("label", json(field.label()));
+        switch (field.type()) {
+            case TEXT, NUMBER -> {
+                input.addProperty("type", "minecraft:text");
+                input.addProperty("initial", value);
+                input.addProperty("max_length", field.type() == Field.Type.TEXT ? Math.max(1, field.max()) : 11);
+            }
+            case CHOICE -> {
+                input.addProperty("type", "minecraft:single_option");
+                JsonArray options = new JsonArray();
+                int selected = field.optionIndex(value);
+                for (int i = 0; i < field.options().size(); i++) {
+                    JsonObject option = new JsonObject();
+                    option.addProperty("id", Integer.toString(i));
+                    option.add("display", json(field.options().get(i).label()));
+                    option.addProperty("initial", i == selected);
+                    options.add(option);
+                }
+                input.add("options", options);
+            }
+            case TOGGLE -> {
+                input.addProperty("type", "minecraft:boolean");
+                input.addProperty("initial", Boolean.parseBoolean(value));
+                input.addProperty("on_true", "true");
+                input.addProperty("on_false", "false");
+            }
         }
-        Consumer<Player> action = actions.get(token);
-        if (action != null) {
-            this.scheduler.runFor(player, () -> action.accept(player));
+        return input;
+    }
+
+    private static String optionId(Field field, String index) {
+        try {
+            int i = Integer.parseInt(index.strip());
+            return i >= 0 && i < field.options().size() ? field.options().get(i).id() : "";
+        } catch (NumberFormatException e) {
+            return "";
         }
     }
 
-    void forget(UUID player) {
-        this.pending.remove(player);
+    private static String token() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
-    private JsonObject action(Player player, Button button, Map<String, Consumer<Player>> actions) {
+    private JsonObject action(Player player, Button button, Map<String, BiConsumer<Player, String>> actions) {
         JsonObject entry = new JsonObject();
         entry.add("label", json(button.label()));
         if (!button.lore().isEmpty()) {
             entry.add("tooltip", json(Component.join(net.kyori.adventure.text.JoinConfiguration.newlines(),
                     button.lore())));
         }
-        String token = UUID.randomUUID().toString().substring(0, 8);
-        button.action().ifPresent(action -> actions.put(token, action));
+        String token = token();
+        button.action().ifPresent(action -> actions.put(token, (target, values) -> action.accept(target)));
         JsonObject click = new JsonObject();
         click.addProperty("type", "minecraft:run_command");
         click.addProperty("command", "/" + this.callbackCommand + " " + token);

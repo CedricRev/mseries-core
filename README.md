@@ -199,6 +199,21 @@ menus.open(player, Menu.confirm(Text.parse("Reset?"), Text.parse("This cannot be
 ```
 
 - `menus.open(player, () -> buildMenu(player), 20)` rebuilds a chest menu every 20 ticks while it is open.
+- `Menu.form(title)` asks for values: text, whole numbers, a choice from a list, and on/off toggles. Bedrock players get a custom form, Java players on 1.21.6 or newer get a dialog with inputs, and older Java clients answer each field in chat. Values are checked before `submit` runs; a wrong value shows the form again with the `invalid` message and the player's answers kept.
+
+```java
+menus.open(player, Menu.form(Text.parse("<gold>Create shop"))
+        .field(Field.choice("direction", Text.parse("Direction"))
+                .option("SELL", Text.parse("Sell"))
+                .option("BUY", Text.parse("Buy")))
+        .field(Field.number("bundle", Text.parse("Items per bundle")).range(1, 64).initial(1))
+        .field(Field.number("price", Text.parse("Price")).range(1, 1_000_000))
+        .submit(Text.parse("Create"), (who, answers) ->
+                create(who, answers.choice("direction"), answers.number("bundle"), answers.number("price")))
+        .build());
+```
+
+- Pass translated text with `cancel(label)`, `invalid(field -> message)` and `chatHint(hint, cancelWord)`; the chat fallback stops when the player types the cancel word.
 - Dialog buttons run the hidden command `/<plugin>-menu <token>`, which `Menus` registers. Don't register a command with that name.
 - Floodgate and Cumulus come from the Floodgate plugin. Add `softdepend: [floodgate]` and don't shade or relocate `org.geysermc`.
 
