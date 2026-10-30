@@ -3,6 +3,11 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 1.1.1
+
+### Fixed
+- `ConfigFile.load(plugin, name, openSections...)`: sections that owners fill with their own entries (vote sites, shop items, reward tiers) no longer get the jar's example entries added back on every start. A missing open section is still added with its defaults.
+
 ## 1.1.0
 
 ### Added
