@@ -13,6 +13,7 @@ junit = "5.14.4"
 floodgate = "2.2.3-SNAPSHOT"
 cumulus = "1.1.2"
 vault-unlocked = "2.11"
+griefprevention = "16.18.7"
 
 [libraries]
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
@@ -40,3 +41,5 @@ floodgate-api = { module = "org.geysermc.floodgate:api", version.ref = "floodgat
 cumulus = { module = "org.geysermc.cumulus:cumulus", version.ref = "cumulus" }
 # Provided by Vault or VaultUnlocked at runtime; holds both the legacy and the VaultUnlocked economy API.
 vault-unlocked-api = { module = "net.milkbowl.vault:VaultUnlockedAPI", version.ref = "vault-unlocked" }
+# Provided by the GriefPrevention plugin at runtime; only loaded when GriefPrevention is enabled.
+griefprevention = { module = "com.github.GriefPrevention:GriefPrevention", version.ref = "griefprevention" }

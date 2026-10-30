@@ -17,6 +17,9 @@ repositories {
     maven("https://repo.codemc.org/repository/maven-public/") {
         content { includeGroup("net.milkbowl.vault") }
     }
+    maven("https://jitpack.io") {
+        content { includeGroup("com.github.GriefPrevention") }
+    }
 }
 
 java {
@@ -49,6 +52,7 @@ dependencies {
     compileOnly(libs.floodgate.api)
     compileOnly(libs.cumulus)
     compileOnly(libs.vault.unlocked.api) { isTransitive = false }
+    compileOnly(libs.griefprevention) { isTransitive = false }
 
     // Exposed to plugins, which shade and relocate them together with core.
     api(libs.cloud.core)
