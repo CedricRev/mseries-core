@@ -9,6 +9,12 @@ This project follows [Semantic Versioning](https://semver.org/).
 - `Menu.form(title)` with `Field.text`, `Field.number`, `Field.choice` and `Field.toggle`: one form description, shown as a Bedrock custom form, a Java dialog with inputs (1.21.6+) or chat questions on older Java clients.
   - Answers are checked against each field (length, number range, known option) before the `submit` action runs, and come back typed through `FormResponse`.
   - A wrong answer shows the form again with the owner's `invalid` message and the player's other answers kept.
+- `Economy.vault(plugin)`: checks balances, charges and pays players through the VaultUnlocked API when it is installed, and through the legacy Vault API otherwise.
+  - `withdraw` and `deposit` return the economy plugin's real result as an `EconomyResult` (success, skipped for zero amounts, or failed with the reason).
+  - Amounts are `BigDecimal`; `format` and `currency` use the economy plugin's own formatting and names.
+- `Claims.griefPrevention(plugin, scheduler)`: the GriefPrevention claim at a location, with its id, owner and admin flag.
+  - `canBuild` checks build trust for an online player or for a UUID alone, so features keep working while their owner is offline.
+  - `onChange` reports deleted claims (with their subclaims) and transferred claims one tick after the change.
 
 ## 1.1.1
 
