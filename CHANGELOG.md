@@ -3,6 +3,12 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 1.3.0
+
+### Added
+- `NameResolver.displayName(player)` and `displayName(uuid, fallback)`: the Bedrock gamertag for Bedrock players, the in-game name for Java players, also for offline players already in `known_players`.
+- `Menus.text(player, messages, key, args...)`: uses the `bedrock-forms.<key>` message for players who see a Bedrock form, and the normal key otherwise.
+
 ## 1.2.0
 
 ### Added
