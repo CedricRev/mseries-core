@@ -55,6 +55,36 @@ public final class NameResolver implements Listener {
         return this.floodgate && FloodgateNames.prefix().isEmpty();
     }
 
+    public String displayName(Player player) {
+        if (this.floodgate) {
+            Optional<String[]> bedrock = FloodgateNames.gamertagAndXuid(player.getUniqueId());
+            if (bedrock.isPresent() && bedrock.get()[0] != null && !bedrock.get()[0].isBlank()) {
+                return bedrock.get()[0];
+            }
+        }
+        return player.getName();
+    }
+
+    public CompletableFuture<String> displayName(UUID uuid, String fallback) {
+        Player online = this.plugin.getServer().getPlayer(uuid);
+        if (online != null) {
+            return CompletableFuture.completedFuture(displayName(online));
+        }
+        return this.storage.query(connection -> {
+            try (PreparedStatement statement = connection.prepareStatement("SELECT name, gamertag FROM " + this.table
+                    + " WHERE uuid = ?")) {
+                statement.setString(1, uuid.toString());
+                try (ResultSet row = statement.executeQuery()) {
+                    if (!row.next()) {
+                        return fallback;
+                    }
+                    String gamertag = row.getString("gamertag");
+                    return gamertag != null && !gamertag.isBlank() ? gamertag : row.getString("name");
+                }
+            }
+        });
+    }
+
     public CompletableFuture<Void> remember(UUID uuid, String name) {
         return save(uuid, name, null, null);
     }

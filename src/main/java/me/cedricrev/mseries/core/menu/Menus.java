@@ -6,6 +6,8 @@ import java.util.function.Supplier;
 import me.cedricrev.mseries.core.command.CommandActor;
 import me.cedricrev.mseries.core.command.CommandService;
 import me.cedricrev.mseries.core.scheduler.Scheduler;
+import me.cedricrev.mseries.core.text.Arg;
+import me.cedricrev.mseries.core.text.Messages;
 import net.kyori.adventure.text.Component;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,6 +18,8 @@ import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.parser.standard.StringParser;
 
 public final class Menus implements Listener, FormSubmitter {
+
+    public static final String BEDROCK_FORMS = "bedrock-forms";
 
     private final Plugin plugin;
     private final Scheduler scheduler;
@@ -57,6 +61,12 @@ public final class Menus implements Listener, FormSubmitter {
             return MenuStyle.BEDROCK_FORM;
         }
         return this.dialogs != null ? MenuStyle.JAVA_DIALOG : MenuStyle.CHEST;
+    }
+
+    public Component text(Player player, Messages messages, String key, Arg... args) {
+        String formKey = BEDROCK_FORMS + "." + key;
+        boolean form = styleFor(player) == MenuStyle.BEDROCK_FORM && messages.has(formKey);
+        return messages.get(form ? formKey : key, args);
     }
 
     public void open(Player player, Menu menu) {

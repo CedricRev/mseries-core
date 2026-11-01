@@ -216,6 +216,7 @@ menus.open(player, Menu.form(Text.parse("<gold>Create shop"))
 ```
 
 - Pass translated text with `cancel(label)`, `invalid(field -> message)` and `chatHint(hint, cancelWord)`; the chat fallback stops when the player types the cancel word.
+- `menus.text(player, messages, key, args...)` reads `bedrock-forms.<key>` from `messages.yml` when the player sees a Bedrock form and that key exists, and `<key>` otherwise. Use it for form titles and buttons, which sit on a light background on Bedrock.
 - Dialog buttons run the hidden command `/<plugin>-menu <token>`, which `Menus` registers. Don't register a command with that name.
 - Floodgate and Cumulus come from the Floodgate plugin. Add `softdepend: [floodgate]` and don't shade or relocate `org.geysermc`.
 
@@ -248,6 +249,8 @@ The checks run in this order:
 2. With an empty prefix only: the name with spaces turned into `_` and cut to 16 characters, the way Floodgate names Bedrock players.
 3. With an empty prefix only: the Bedrock gamertag looked up through Floodgate, for players who have joined before.
 4. With an empty prefix only: a loose match that ignores case, spaces and `_`. It counts only when exactly one known player fits; otherwise the result is `AMBIGUOUS`.
+
+`names.displayName(player)` gives a Bedrock player's gamertag and a Java player's name. `names.displayName(uuid, fallback)` does the same for offline players from `known_players`.
 
 ## License
 
