@@ -80,6 +80,20 @@ final class GriefPreventionClaims implements Claims, Listener {
     }
 
     @Override
+    public boolean isTrusted(Player player, Location location) {
+        Optional<Claim> claim = find(location);
+        if (claim.isEmpty() || player.getUniqueId().equals(claim.get().getOwnerID())) {
+            return true;
+        }
+        try {
+            return claim.get().checkPermission(player, ClaimPermission.Access, null) == null;
+        } catch (RuntimeException | LinkageError e) {
+            warn("trust check", e);
+            return false;
+        }
+    }
+
+    @Override
     public void onChange(Consumer<ClaimChange> listener) {
         this.listeners.add(listener);
     }

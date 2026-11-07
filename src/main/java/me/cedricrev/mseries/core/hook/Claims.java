@@ -22,5 +22,7 @@ public interface Claims {
 
     boolean canBuild(UUID player, Location location);
 
+    boolean isTrusted(Player player, Location location);
+
     void onChange(Consumer<ClaimChange> listener);
 }
