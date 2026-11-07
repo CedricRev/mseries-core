@@ -3,6 +3,18 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 1.4.0
+
+### Added
+- `Teleports.create(plugin, scheduler)`: teleports a player safely on Spigot, Paper and Folia.
+  - Loads the destination chunk in the background where the server can, then checks the landing spot on the destination's region thread.
+  - Safe landing looks up and down from the spot (nearest first) for solid ground or water with room for feet and head, and avoids lava, fire, magma, cactus, powder snow and portals.
+  - Returns a `TeleportResult`: success, unsafe destination, missing world, player offline or failed.
+- `Warmups.create(plugin, scheduler)`: a countdown before an action that taking damage or moving to another block can cancel, with the reason passed back.
+- `Cooldowns` and `CombatTags.create(plugin, seconds)`: per-player timers in whole seconds; combat tags start when a player hits another player, also with arrows and other projectiles.
+- `NameResolver.online(typed)`: finds an online player by in-game name or Bedrock gamertag; spaces and underscores count as the same, a Floodgate prefix is optional, and a unique start of a name is enough.
+- `PackForm`: a Bedrock button form that can carry title and button markers for a resource pack layout, and falls back to a plain form without them.
+
 ## 1.3.0
 
 ### Added

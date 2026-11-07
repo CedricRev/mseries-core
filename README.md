@@ -13,7 +13,9 @@ What it gives a plugin:
 - **Economy:** `Economy.vault(this)` pays and charges players through VaultUnlocked when it is installed and the legacy Vault API otherwise, and returns the economy plugin's real result.
 - **Claims:** `Claims.griefPrevention(this, scheduler)` finds the GriefPrevention claim at a spot, checks whether a player can build there even while offline, and reports deleted or transferred claims.
 - **Menus:** `Menus.create(this, scheduler, commands)` shows one menu as a Bedrock form, a Java dialog or a chest menu, picked per player.
-- **Player names:** `NameResolver.create(this, storage)` turns a typed name into a player, including Bedrock gamertags on servers without a Floodgate prefix.
+- **Player names:** `NameResolver.create(this, storage)` turns a typed name into a player, including Bedrock gamertags on servers without a Floodgate prefix. `online(typed)` also accepts the unique start of an online player's name.
+- **Teleports:** `Teleports.create(this, scheduler)` moves a player to a safe spot near the destination on every platform; `Warmups`, `Cooldowns` and `CombatTags` cover the timers around it.
+- **Pack forms:** `PackForm.create(scheduler)` sends a Bedrock form with markers that a resource pack can lay out, or a plain form when the pack is off.
 - **Scheduler:** `Scheduler.create(this)` runs tasks on Folia's global, region, entity and async schedulers, and on the Bukkit scheduler everywhere else. Plugins never call `Bukkit.getScheduler()` themselves.
 
 ## How to use it
@@ -29,7 +31,7 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:26.3-R0.1-SNAPSHOT")
     compileOnly("com.mojang:brigadier:1.3.10")
-    implementation("com.github.CedricRev:mseries-core:v1.3.0")
+    implementation("com.github.CedricRev:mseries-core:v1.4.0")
 }
 
 tasks.withType<JavaCompile>().configureEach {
