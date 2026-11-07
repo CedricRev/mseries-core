@@ -3,6 +3,11 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 1.4.1
+
+### Added
+- `Claims.isTrusted(player, location)`: true when the location is outside a claim, or the player owns the claim or has any trust there (access trust or higher).
+
 ## 1.4.0
 
 ### Added

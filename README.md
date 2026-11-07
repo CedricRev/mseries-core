@@ -31,7 +31,7 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:26.3-R0.1-SNAPSHOT")
     compileOnly("com.mojang:brigadier:1.3.10")
-    implementation("com.github.CedricRev:mseries-core:v1.4.0")
+    implementation("com.github.CedricRev:mseries-core:v1.4.1")
 }
 
 tasks.withType<JavaCompile>().configureEach {
