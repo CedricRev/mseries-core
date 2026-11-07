@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class NamesTest {
@@ -42,5 +43,32 @@ class NamesTest {
         assertFalse(Names.plausible("   "));
         assertFalse(Names.plausible("drop;table"));
         assertFalse(Names.plausible("x".repeat(41)));
+    }
+
+    @Test
+    void onlineMatchTreatsSpacesLikeUnderscores() {
+        List<String> found = Names.matchOnline("Cool Guy 99", List.of(".Cool_Guy_99", "Steve"), List::of);
+        assertEquals(List.of(".Cool_Guy_99"), found);
+    }
+
+    @Test
+    void onlineMatchUsesAUniquePrefix() {
+        assertEquals(List.of("Alexandra"), Names.matchOnline("alexa", List.of("Alexandra", "Alfred"), List::of));
+    }
+
+    @Test
+    void onlineMatchPrefersAnExactName() {
+        assertEquals(List.of("Alex"), Names.matchOnline("alex", List.of("Alex", "Alexandra"), List::of));
+    }
+
+    @Test
+    void onlineMatchReportsEveryAmbiguousPlayer() {
+        assertEquals(2, Names.matchOnline("al", List.of("Alex", "Alfred", "Steve"), List::of).size());
+    }
+
+    @Test
+    void onlineMatchFindsTheGamertag() {
+        List<String> found = Names.matchOnline("Sunny Day", List.of("Player1"), name -> List.of(name, "Sunny Day"));
+        assertEquals(List.of("Player1"), found);
     }
 }

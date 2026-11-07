@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,25 @@ public final class NameResolver implements Listener {
         });
     }
 
+    public Resolution online(String typed) {
+        return online(typed, List.copyOf(this.plugin.getServer().getOnlinePlayers()));
+    }
+
+    public Resolution online(String typed, Collection<? extends Player> candidates) {
+        if (!Names.plausible(typed)) {
+            return Resolution.invalid();
+        }
+        List<? extends Player> matches = Names.matchOnline(typed, candidates, this::knownNames);
+        if (matches.isEmpty()) {
+            return Resolution.notFound();
+        }
+        if (matches.size() == 1) {
+            Player match = matches.get(0);
+            return Resolution.found(match.getUniqueId(), match.getName());
+        }
+        return Resolution.ambiguous(matches.stream().map(this::displayName).toList());
+    }
+
     public CompletableFuture<Void> remember(UUID uuid, String name) {
         return save(uuid, name, null, null);
     }
@@ -122,6 +142,17 @@ public final class NameResolver implements Listener {
                                     ? CompletableFuture.completedFuture(byXuid)
                                     : this.storage.query(connection -> findLoose(connection, Names.looseKey(name))));
                 });
+    }
+
+    private List<String> knownNames(Player player) {
+        List<String> names = new ArrayList<>(List.of(player.getName()));
+        if (this.floodgate) {
+            FloodgateNames.gamertagAndXuid(player.getUniqueId())
+                    .map(bedrock -> bedrock[0])
+                    .filter(gamertag -> gamertag != null && !gamertag.isBlank())
+                    .ifPresent(names::add);
+        }
+        return names;
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
