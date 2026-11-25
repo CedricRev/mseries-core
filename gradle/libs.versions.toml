@@ -14,6 +14,7 @@ floodgate = "2.2.3-SNAPSHOT"
 cumulus = "1.1.2"
 vault-unlocked = "2.11"
 griefprevention = "16.18.7"
+discordsrv = "1.29.0"
 
 [libraries]
 spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
@@ -43,3 +44,5 @@ cumulus = { module = "org.geysermc.cumulus:cumulus", version.ref = "cumulus" }
 vault-unlocked-api = { module = "net.milkbowl.vault:VaultUnlockedAPI", version.ref = "vault-unlocked" }
 # Provided by the GriefPrevention plugin at runtime; only loaded when GriefPrevention is enabled.
 griefprevention = { module = "com.github.GriefPrevention:GriefPrevention", version.ref = "griefprevention" }
+# Provided by the DiscordSRV plugin at runtime; only loaded when DiscordSRV is enabled and MBridge is not.
+discordsrv = { module = "com.discordsrv:discordsrv", version.ref = "discordsrv" }

@@ -12,6 +12,7 @@ What it gives a plugin:
 - **Hooks:** `Hooks.of(this).load("Vault", VaultHook::new)` loads soft-dependency hooks safely.
 - **Economy:** `Economy.vault(this)` pays and charges players through VaultUnlocked when it is installed and the legacy Vault API otherwise, and returns the economy plugin's real result.
 - **Claims:** `Claims.griefPrevention(this, scheduler)` finds the GriefPrevention claim at a spot, checks whether a player can build there even while offline, and reports deleted or transferred claims.
+- **Discord:** `Discord.of(this)` sends embeds and plain text to Discord through MBridge when it is installed and DiscordSRV otherwise, and checks whether a player has linked their Discord account. `Discord.escape` makes names safe for Discord markdown.
 - **Menus:** `Menus.create(this, scheduler, commands)` shows one menu as a Bedrock form, a Java dialog or a chest menu, picked per player.
 - **Player names:** `NameResolver.create(this, storage)` turns a typed name into a player, including Bedrock gamertags on servers without a Floodgate prefix. `online(typed)` also accepts the unique start of an online player's name.
 - **Teleports:** `Teleports.create(this, scheduler)` moves a player to a safe spot near the destination on every platform; `Warmups`, `Cooldowns` and `CombatTags` cover the timers around it.
@@ -31,7 +32,7 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:26.3-R0.1-SNAPSHOT")
     compileOnly("com.mojang:brigadier:1.3.10")
-    implementation("com.github.CedricRev:mseries-core:v1.4.1")
+    implementation("com.github.CedricRev:mseries-core:v1.5.0")
 }
 
 tasks.withType<JavaCompile>().configureEach {

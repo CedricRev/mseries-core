@@ -5,7 +5,7 @@ plugins {
 
 group = "me.cedricrev.mseries"
 // Manual CI runs pass -PdevBuild=<short-sha> to get a <version>-dev+<sha> test build.
-version = "1.4.1" + (findProperty("devBuild")?.let { "-dev+$it" } ?: "")
+version = "1.5.0" + (findProperty("devBuild")?.let { "-dev+$it" } ?: "")
 
 repositories {
     mavenCentral()
@@ -19,6 +19,9 @@ repositories {
     }
     maven("https://jitpack.io") {
         content { includeGroup("com.github.GriefPrevention") }
+    }
+    maven("https://nexus.scarsz.me/content/groups/public/") {
+        content { includeGroup("com.discordsrv") }
     }
 }
 
@@ -53,6 +56,7 @@ dependencies {
     compileOnly(libs.cumulus)
     compileOnly(libs.vault.unlocked.api) { isTransitive = false }
     compileOnly(libs.griefprevention) { isTransitive = false }
+    compileOnly(libs.discordsrv) { isTransitive = false }
 
     // Exposed to plugins, which shade and relocate them together with core.
     api(libs.cloud.core)
