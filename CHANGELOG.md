@@ -3,6 +3,14 @@
 All notable changes to mseries-core are listed here, newest first.
 This project follows [Semantic Versioning](https://semver.org/).
 
+## 1.5.0
+
+### Added
+- `Discord.of(plugin)`: sends embeds (`DiscordEmbed`) and plain text to Discord through MBridge when it is installed and connected, and through DiscordSRV otherwise.
+  - Channels: empty or `main` is the chat channel; a Discord channel ID or a DiscordSRV channel name also work.
+  - `linked(player)` checks whether a player has linked their Discord account, and `canCheckLinks()` says whether that check is possible.
+  - Posts never ping anyone. `Discord.escape(text)` makes names safe for Discord markdown.
+
 ## 1.4.1
 
 ### Added
